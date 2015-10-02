@@ -1,12 +1,3 @@
-[submodule "p5-AnySan-Provider-Slack"]
-	path = p5-AnySan-Provider-Slack
-	url = https://github.com/shogo82148/p5-AnySan-Provider-Slack.git
-[submodule "vendor/AnySan-Provider-Slack"]
-	path = vendor/AnySan-Provider-Slack
-	url = https://github.com/shogo82148/p5-AnySan-Provider-Slack.git
-[submodule "vendor/evalbot"]
-	path = vendor/evalbot
-	url = https://github.com/perl6/evalbot.git
 [submodule "evalbot"]
 	path = evalbot
 	url = https://github.com/perl6/evalbot.git
