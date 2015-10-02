@@ -19,6 +19,8 @@ This is a perl6 evalbot for slack. It uses:
 
         docker run -e SLACK_TOKEN=XXX -e SLACK_CHANNEL_NAME=general -e SLACK_CHANNEL_ID=C06TR4JF9 -d slack-perl6-evalbot
 
+6. Finally mention your bot in the channel!
+
 ## author
 
 Shoichi Kaji
