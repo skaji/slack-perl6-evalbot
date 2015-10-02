@@ -1,4 +1,12 @@
-requires "5.22.0";
-requires "AnySan::Provider::Slack";
+requires "perl", "5.22.0";
+requires "AnyEvent::HTTP";
+requires "AnyEvent::SlackRTM";
 requires "AnySan";
-# requires "EvalbotExecuter";
+requires "AnySan::Receive";
+requires "EV";
+requires "HTTP::Request::Common";
+requires "JSON";
+requires 'BSD::Resource';
+requires 'File::RotateLogs';
+requires 'IO::Socket::SSL';
+requires 'Proclet';

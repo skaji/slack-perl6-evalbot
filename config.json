@@ -1,7 +1,0 @@
-{
-  "token_env": "SLACK_TOKEN",
-  "channel": {
-    "id": "C06TR4JF9",
-    "name": "general"
-  }
-}

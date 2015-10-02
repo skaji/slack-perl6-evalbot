@@ -7,3 +7,6 @@
 [submodule "vendor/evalbot"]
 	path = vendor/evalbot
 	url = https://github.com/perl6/evalbot.git
+[submodule "evalbot"]
+	path = evalbot
+	url = https://github.com/perl6/evalbot.git
