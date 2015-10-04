@@ -2,8 +2,6 @@
 
 ![](misc/screenshot.png)
 
-WIP
-
 This is a perl6 evalbot for slack. It uses:
 
 * https://github.com/perl6/evalbot
