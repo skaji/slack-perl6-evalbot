@@ -3,9 +3,28 @@ use strict;
 use warnings;
 use utf8;
 use 5.22.0;
+use HTTP::Tiny;
+use JSON::PP;
+use IO::Socket::SSL;
 use EvalbotExecuter;
 use Exporter 'import';
-our @EXPORT_OK = qw(slack_unescape perl6_eval perl6_version);
+our @EXPORT_OK = qw(get_channel_id slack_unescape perl6_eval perl6_version);
+
+sub get_channel_id {
+    my %arg = @_;
+    my $token = $arg{token} or die;
+    my $channel = $arg{channel} or die;
+    my $url = "https://slack.com/api/channels.list?token=$token";
+    my $res = HTTP::Tiny->new(timeout => 10)->get($url);
+    die "Failed to get channel.list: $res->{status} $res->{reason}" unless $res->{status};
+    my $hash = decode_json $res->{content};
+    for my $item (@{$hash->{channels}}) {
+        if ($item->{name} eq $channel) {
+            return $item->{id};
+        }
+    }
+    die "Could not find channel '$channel'";
+}
 
 sub slack_unescape {
     my $decoded = shift;

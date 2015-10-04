@@ -7,12 +7,11 @@ use lib "$Bin/lib";
 use IO::Socket::SSL;
 use AnySan::Provider::Slack;
 use AnySan;
-use JSON::PP;
-use Util qw(slack_unescape perl6_eval perl6_version);
+use Util qw(get_channel_id slack_unescape perl6_eval perl6_version);
 
 my $token = $ENV{SLACK_TOKEN} or die "miss SLACK_TOKEN";
-my $channel_name = $ENV{SLACK_CHANNEL_NAME} or die "miss SLACK_CHANNEL_NAME";
-my $channel_id = $ENV{SLACK_CHANNEL_ID} or die "miss SLACK_CHANNEL_ID";
+my $channel_name = $ENV{SLACK_CHANNEL} or die "miss SLACK_CHANNEL_NAME";
+my $channel_id = get_channel_id token => $token, channel => $channel_name;
 delete $ENV{$_} for grep {/^SLACK/} keys %ENV;
 
 my $slack = slack
