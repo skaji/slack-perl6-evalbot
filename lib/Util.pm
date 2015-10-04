@@ -16,7 +16,7 @@ sub get_channel_id {
     my $channel = $arg{channel} or die;
     my $url = "https://slack.com/api/channels.list?token=$token";
     my $res = HTTP::Tiny->new(timeout => 10)->get($url);
-    die "Failed to get channel.list: $res->{status} $res->{reason}" unless $res->{status};
+    die "Failed to get channel.list: $res->{status} $res->{reason}" unless $res->{success};
     my $hash = decode_json $res->{content};
     for my $item (@{$hash->{channels}}) {
         if ($item->{name} eq $channel) {
