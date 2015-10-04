@@ -17,15 +17,18 @@ This is a perl6 evalbot for slack. It uses:
 5. Choose channel and determine channel id from https://slack.com/api/channels.list?token=XXXXX&pretty=1
 6. Then:
 
-        docker run -e SLACK_TOKEN=XXX -e SLACK_CHANNEL_NAME=general -e SLACK_CHANNEL_ID=C06TR4JF9 -d slack-perl6-evalbot
+        docker run -e SLACK_TOKEN=XXX \
+                   -e SLACK_CHANNEL_NAME=channel \
+                   -e SLACK_CHANNEL_ID=CXXXXXX \
+                   -d evalbot
 
 7. Finally mention your bot in the channel!
 
 # how to update perl6
 
-1. Build main docker again: `docker build -t evalbot --no-cache=true .`
-2. Stop existing container: `docker stop PREVIOUS_ID`
-3. Re-run docker: `docker run -e ... evalbot`
+1. Rebuild main docker: `docker build -t evalbot --no-cache=true .`
+2. Stop existing container: `docker stop EXISTING_ID`
+3. Re-run docker: `docker run -e ... -d evalbot`
 
 ## author
 
