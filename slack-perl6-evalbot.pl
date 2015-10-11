@@ -10,7 +10,7 @@ use AnySan;
 use Util qw(get_channel_id slack_unescape perl6_eval perl6_version);
 
 my $token = $ENV{SLACK_TOKEN} or die "miss SLACK_TOKEN";
-my $channel_name = $ENV{SLACK_CHANNEL} or die "miss SLACK_CHANNEL_NAME";
+my $channel_name = $ENV{SLACK_CHANNEL} or die "miss SLACK_CHANNEL";
 my $channel_id = get_channel_id token => $token, channel => $channel_name;
 delete $ENV{$_} for grep {/^SLACK/} keys %ENV;
 
