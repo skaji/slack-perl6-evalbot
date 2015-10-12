@@ -3,4 +3,4 @@ SHELL=/bin/bash
 PATH=/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin
 HOME=/home/skaji
 USER=skaji
-0 5 * * * cd ~/src/github.com/shoichikaji/slack-perl6-evalbot/crontab.sh
+0 5 * * * ~/src/github.com/shoichikaji/slack-perl6-evalbot/crontab.sh
