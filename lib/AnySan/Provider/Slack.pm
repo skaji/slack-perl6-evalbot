@@ -1,7 +1,7 @@
 package AnySan::Provider::Slack;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use base 'AnySan::Provider';
 our @EXPORT = qw(slack);
@@ -29,44 +29,102 @@ sub slack {
         ], sub {});
     }
 
-    # get auth info
-    $self->_call('auth.test', [], sub {
-        my $res = shift;
-        $self->{authinfo} = $res;
-    });
+    $self->start;
 
-    my $rtm = AnyEvent::SlackRTM->new($config{token});
+    return $self;
+}
+
+sub metadata { shift->{rtm}->metadata }
+
+sub user {
+    my ($self, $id) = @_;
+    return $self->{_users}{$id};
+}
+
+sub bot {
+    my ($self, $id) = @_;
+    return $self->{_bots}{$id};
+}
+
+sub start {
+    my $self = shift;
+
+    my $rtm = AnyEvent::SlackRTM->new($self->{config}{token});
     $rtm->on('hello' => sub {
-        $self->{keep_alive} = AnyEvent->timer(
-            interval => 60,
-            cb => sub {
-                $rtm->ping;
-            },
-        );
+        # create hash table of users
+        my $users = {};
+        for my $user (@{$self->metadata->{users}}) {
+            $users->{$user->{id}} ||= $user;
+            $users->{$user->{name}} ||= $user;
+        }
+        $self->{_users} = $users;
+
+        my $bots = {};
+        for my $bot (@{$self->metadata->{bots}}) {
+            $bots->{$bot->{id}} ||= $bot;
+            $bots->{$bot->{name}} ||= $bot;
+        }
+        $self->{_bots} = $bots;
     });
     $rtm->on('message' => sub {
         my ($rtm, $message) = @_;
-        my $authinfo = $self->{authinfo} or return;
-        return if $message->{subtype} && $message->{subtype} eq 'bot_message';
-        return if !$message->{text} && !$message->{message};
+        my $metadata = $self->metadata or return;
+        if ($message->{subtype}) {
+            my $filter = $self->{config}{subtypes} || [];
+            return unless grep { $_ eq 'all' || $_ eq $message->{subtype} } @$filter;
+        }
+        return if $message->{user} eq $metadata->{self}{id};
         $message->{text} //= ($message->{message} || {})->{text} // "";
+
+        # search user nickname
+        my $nickname = '';
+        my $user_id = encode_utf8($message->{user} || '');
+        my $user = $self->user($user_id);
+        my $bot = $self->bot($user_id);
+        $nickname = $user->{name} if $user;
+        $nickname = $bot->{name} if $bot;
+
         my $receive; $receive = AnySan::Receive->new(
             provider      => 'slack',
             event         => 'message',
             message       => $message->{text} // '',
-            nickname      => $authinfo->{user} // '',
-            from_nickname => $message->{user} // '',
+            nickname      => $metadata->{self}{name} // '',
+            from_nickname => $nickname,
             attribute     => {
                 channel => $message->{channel},
+                subtype => $message->{subtype},
+                user    => $user,
+                bot     => $bot,
             },
             cb            => sub { $self->event_callback($receive, @_) },
         );
         AnySan->broadcast_message($receive);
     });
+    $rtm->on('finish' => sub {
+        # reconnect
+        undef $self->{rtm};
+        while (1) {
+            eval { $self->start };
+            last unless $@;
+        }
+    });
+    $rtm->on('user_change' => sub {
+        my ($rtm, $message) = @_;
+        my $user = $message->{user};
+        my $user_id = $user->{id};
+
+        # remove from cache
+        if (my $old_user = $self->{_users}{$user_id}) {
+            delete $self->{_users}{$user_id};
+            delete $self->{_users}{$old_user->{name}};
+        }
+
+        # add new user info to cache
+        $self->{_users}{$user_id} = $user;
+        $self->{_users}{$user->{name}} = $user;
+    });
     $rtm->start;
     $self->{rtm} = $rtm;
-
-    return $self;
 }
 
 sub event_callback {
@@ -127,12 +185,33 @@ B<THE SOFTWARE IS ALPHA QUALITY. API MAY CHANGE WITHOUT NOTICE.>
 
   use AnySan;
   use AnySan::Provider::Slack;
-  my $slack = slack
+  my $slack = slack(
       token => 'YOUR SLACK API TOKEN',
       channels => {
           'general' => {},
-      };
+      },
+
+      as_user => 0, # post messages as bot (default)
+      # as_user => 1, # post messages as user
+
+      subtypes => [], # ignore all subtypes (default)
+      # subtypes => ['bot_message'], # receive messages from bot
+      # subtypes => ['all'], # receive all messages(bot_message, me_message, message_changed, etc)
+  );
   $slack->send_message('slack message', channel => 'C024BE91L');
+
+  AnySan->register_listener(
+      slack => {
+          event => 'message',
+          cb => sub {
+              my $receive = shift;
+              return unless $receive->message;
+              warn $receive->message;
+              warn $receive->attribute->{subtype};
+              $receive->send_reply('hogehoge');
+          },
+      },
+  );
 
 =head1 AUTHOR
 

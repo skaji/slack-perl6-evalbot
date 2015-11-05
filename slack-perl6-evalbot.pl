@@ -18,6 +18,7 @@ my $slack = slack
     token => $token,
     as_user => 1,
     channels => { $channel_name => {} },
+    subtypes => ['message_changed'],
 ;
 
 AnySan->register_listener(perl6_eval => {
