@@ -73,6 +73,7 @@ sub start {
             my $filter = $self->{config}{subtypes} || [];
             return unless grep { $_ eq 'all' || $_ eq $message->{subtype} } @$filter;
         }
+        return unless $message->{user};
         return if $message->{user} eq $metadata->{self}{id};
         $message->{text} //= ($message->{message} || {})->{text} // "";
 
