@@ -28,7 +28,7 @@ ENV PATH=/home/app/perl/bin:$PATH
 ENV HOME=/home/app
 ENV USER=app
 
-RUN curl -sSkL https://git.io/perl-install | bash -s ~/perl
+RUN curl -sSkL https://raw.githubusercontent.com/skaji/relocatable-perl/master/perl-install | bash -s ~/perl
 
 COPY cpanfile proclet.pl slack-perl6-evalbot.pl /home/app/
 COPY evalbot/ /home/app/evalbot/

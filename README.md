@@ -10,7 +10,7 @@ This is a perl6 evalbot for slack. It uses:
 
 # usage
 
-1. `git clone --recursive git://github.com/shoichikaji/slack-perl6-evalbot.git`
+1. `git clone --recursive git://github.com/skaji/slack-perl6-evalbot.git`
 2. Build base docker: `docker build -t evalbot-base -f Dockerfile.base .`
 3. Build main docker: `docker build -t evalbot -f Dockerfile .`
 4. Get API TOKEN from https://my.slack.com/services/new/bot
