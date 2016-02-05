@@ -28,7 +28,9 @@ AnySan->register_listener(perl6_eval => {
         my $message = $receive->{message} || "";
         return unless $message =~ m{\A(?:m|moar|perl6|perl6-m):\s*(\S.*)}sm;
         my $program = $1;
-        $program = $1 if $program =~ /\A`(.+)`\z/;
+        $program =~ s/\s+\z//sm;
+        $program = $1 if $program =~ /\A```(.+)```\z/sm;
+        $program = $1 if $program =~ /\A`(.+)`\z/sm;
         $program = slack_unescape $program;
         my $out = perl6_eval $program;
         $slack->send_message($out, channel => $channel_id);
