@@ -7,17 +7,15 @@ use lib "$Bin/lib";
 use IO::Socket::SSL;
 use AnySan::Provider::Slack;
 use AnySan;
-use Util qw(get_channel_id slack_unescape perl6_eval perl6_version);
+use Util qw(slack_unescape perl6_eval perl6_version);
 
 my $token = $ENV{SLACK_TOKEN} or die "miss SLACK_TOKEN";
-my $channel_name = $ENV{SLACK_CHANNEL} or die "miss SLACK_CHANNEL";
-my $channel_id = get_channel_id token => $token, channel => $channel_name;
 delete $ENV{$_} for grep {/^SLACK/} keys %ENV;
 
 my $slack = slack
     token => $token,
     as_user => 1,
-    channels => { $channel_name => {} },
+    channels => {},
     subtypes => ['message_changed'],
 ;
 
@@ -33,6 +31,7 @@ AnySan->register_listener(perl6_eval => {
         $program = $1 if $program =~ /\A`(.+)`\z/sm;
         $program = slack_unescape $program;
         my $out = perl6_eval $program;
+        my $channel_id = $receive->{attribute}{channel};
         $slack->send_message($out, channel => $channel_id);
     },
 });
@@ -44,6 +43,7 @@ AnySan->register_listener(perl6_version => {
         my $message = $receive->{message} || "";
         return unless $message =~ m{\A(?:m|moar|perl6|perl6-m)-(?:v|version):};
         my $out = perl6_version;
+        my $channel_id = $receive->{attribute}{channel};
         $slack->send_message($out, channel => $channel_id);
     },
 });
