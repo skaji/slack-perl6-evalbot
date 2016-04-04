@@ -23,9 +23,7 @@ ENV USER=app
 
 RUN curl -sSkL https://raw.githubusercontent.com/skaji/relocatable-perl/master/perl-install | bash -s ~/perl
 
-COPY cpanfile proclet.pl slack-perl6-evalbot.pl /home/app/
-COPY evalbot/ /home/app/evalbot/
-COPY lib/ /home/app/lib/
+COPY cpanfile /home/app/
 RUN cpanm -nq --installdeps .
 RUN git clone git://github.com/tadzik/rakudobrew.git ~/.rakudobrew
 RUN perl ~/.rakudobrew/bin/rakudobrew build moar

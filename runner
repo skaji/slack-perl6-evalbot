@@ -1,0 +1,6 @@
+#!/bin/bash
+
+LOG=$(date +%Y-%m-%d).log
+exec >>$LOG
+exec 2>&1
+exec perl slack-perl6-evalbot.pl

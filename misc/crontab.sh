@@ -6,7 +6,7 @@ logger() {
   echo "[$(date)] $@"
 }
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")"/..
 
 LOGFILE=evalbot.log.$(date +%Y%m%d)
 SLACK_TOKEN=$(cat SLACK_TOKEN)
